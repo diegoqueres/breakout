@@ -20,12 +20,8 @@ public class Breakout extends ApplicationAdapter {
 	@Override
 	public void create () {
 		shape = new ShapeRenderer();
-		for (int i = 0; i < 10; i++) {
-			balls.add(new Ball(r.nextInt(Gdx.graphics.getWidth()), r.nextInt(Gdx.graphics.getHeight()),
-					r.nextInt(100),
-					r.nextInt(15), r.nextInt(15))
-			);
-		}
+		Ball ball = new Ball(r.nextInt(Gdx.graphics.getWidth()), r.nextInt(Gdx.graphics.getHeight()));
+		balls.add(ball);
 	}
 
 	@Override
