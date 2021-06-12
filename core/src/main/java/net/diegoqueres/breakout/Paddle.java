@@ -9,6 +9,7 @@ public class Paddle implements Shape {
     public static final int DEFAULT_WIDTH = 120;
     public static final int DEFAULT_HEIGHT = 15;
 
+    Color color;
     int x;
     int y;
     int width;
@@ -19,6 +20,7 @@ public class Paddle implements Shape {
     }
 
     public Paddle(int x, int y, int width, int height) {
+        this.color = Color.LIGHT_GRAY;
         this.x = x;
         this.y = y;
         this.width = width;
@@ -58,7 +60,7 @@ public class Paddle implements Shape {
     public boolean isOutOfBottomCorner() { return y < DEFAULT_BOTTOM_CORNER; }
 
     public void draw(ShapeRenderer shape) {
-        shape.setColor(Color.WHITE);
+        shape.setColor(color);
         shape.rect(x, y, width, height);
     }
 

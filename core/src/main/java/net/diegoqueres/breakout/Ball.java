@@ -1,13 +1,14 @@
 package net.diegoqueres.breakout;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import net.diegoqueres.breakout.geometry.Point;
 import net.diegoqueres.breakout.geometry.Rectangle;
 
 public class Ball implements Shape {
-    public static final int DEFAULT_SIZE = 10;
+    public static final int DEFAULT_SIZE = 9;
     public static final int DEFAULT_X_SPEED = 4;
     public static final int DEFAULT_Y_SPEED = 4;
 
@@ -83,15 +84,18 @@ public class Ball implements Shape {
         shape.circle(x, y, size);
     }
 
-    public void checkCollision(Paddle paddle) {
-        if (collidesWith(paddle))
+    public void checkCollision(Paddle paddle, Sound hitSound) {
+        if (collidesWith(paddle)) {
             this.ySpeed *= -1;
+            hitSound.play(0.3f);
+        }
     }
 
-    public void checkCollision(Block block) {
+    public void checkCollision(Block block, Sound hitSound) {
         if (collidesWith(block)) {
             this.ySpeed = - this.ySpeed;
             block.destroyed = true;
+            hitSound.play(0.3f);
         }
     }
 

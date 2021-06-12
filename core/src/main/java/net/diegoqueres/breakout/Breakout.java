@@ -2,6 +2,8 @@ package net.diegoqueres.breakout;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Sound;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
@@ -14,22 +16,30 @@ public class Breakout extends ApplicationAdapter {
     List<Block> blocks = new ArrayList<>();
     Paddle paddle;
     Ball ball;
+    Sound hitBlockSound;
+    Sound hitPaddleSound;
     Random r = new Random();
 
     @Override
     public void create() {
-        shape = new ShapeRenderer();
-        ball = new Ball(r.nextInt(Gdx.graphics.getWidth()), r.nextInt(Gdx.graphics.getHeight()));
-
+        //Game elements
         int blockWidth = 63;
         int blockHeight = 20;
-        for (int y = Gdx.graphics.getHeight() / 2; y < Gdx.graphics.getHeight(); y += blockHeight + 10) {
-            for (int x = 0; x < Gdx.graphics.getWidth(); x += blockWidth + 10) {
-                blocks.add(new Block(x, y, blockWidth, blockHeight));
+        int blockPadding = 10;
+        for (int y = Gdx.graphics.getHeight() / 2; y < Gdx.graphics.getHeight(); y += blockHeight + blockPadding) {
+            for (int x = 0; x < Gdx.graphics.getWidth(); x += blockWidth + blockPadding) {
+                Color colBlockColor = Block.BLOCK_COLORS[x % Block.BLOCK_COLORS.length];
+                blocks.add(new Block(colBlockColor, x, y, blockWidth, blockHeight));
             }
         }
+        ball = new Ball(r.nextInt(Gdx.graphics.getWidth()), r.nextInt(Gdx.graphics.getHeight()/2 - blockPadding));
+        paddle = new Paddle(Gdx.graphics.getWidth()/2);
 
-        paddle = new Paddle(Gdx.graphics.getWidth() / 2);
+        //assets
+        hitBlockSound = Gdx.audio.newSound(Gdx.files.internal("hit_block.wav"));
+        hitPaddleSound = Gdx.audio.newSound(Gdx.files.internal("hit_paddle.wav"));
+
+        shape = new ShapeRenderer();
     }
 
     @Override
@@ -52,10 +62,10 @@ public class Breakout extends ApplicationAdapter {
     private void update() {
         int x = Gdx.input.getX();
         paddle.updatePosition(x);
-        ball.checkCollision(paddle);
+        ball.checkCollision(paddle, hitPaddleSound);
 
         for (Block block : blocks) {
-            ball.checkCollision(block);
+            ball.checkCollision(block, hitBlockSound);
         }
         updateBlocks();
 
