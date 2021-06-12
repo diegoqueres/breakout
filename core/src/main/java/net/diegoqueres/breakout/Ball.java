@@ -88,12 +88,41 @@ public class Ball implements Shape {
             this.ySpeed *= -1;
     }
 
+    public void checkCollision(Block block) {
+        if (collidesWith(block)) {
+            this.ySpeed = - this.ySpeed;
+            block.destroyed = true;
+        }
+    }
+
     public boolean collidesWith(Paddle paddle) {
         Rectangle rect = new Rectangle();
         rect.x = paddle.x + (paddle.width/2);
         rect.y = paddle.y + (paddle.height/2);
         rect.width = paddle.width;
         rect.height = paddle.height;
+        Point circleDistance = new Point();
+        circleDistance.x = Math.abs(this.x - rect.x);
+        circleDistance.y = Math.abs(this.y - rect.y);
+
+        if (circleDistance.x > (rect.width/2 + this.r)) { return false; }
+        if (circleDistance.y > (rect.height/2 + this.r)) { return false; }
+
+        if (circleDistance.x <= (rect.width/2)) { return true; }
+        if (circleDistance.y <= (rect.height/2)) { return true; }
+
+        double cornerDistance_sq = Math.pow((circleDistance.x - rect.width/2), 2) +
+                Math.pow((circleDistance.y - rect.height/2), 2);
+
+        return (cornerDistance_sq <= Math.pow(this.r, 2));
+    }
+
+    public boolean collidesWith(Block block) {
+        Rectangle rect = new Rectangle();
+        rect.x = block.x + (block.width/2);
+        rect.y = block.y + (block.height/2);
+        rect.width = block.width;
+        rect.height = block.height;
         Point circleDistance = new Point();
         circleDistance.x = Math.abs(this.x - rect.x);
         circleDistance.y = Math.abs(this.y - rect.y);
