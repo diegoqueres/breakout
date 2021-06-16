@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Random;
 
 public class Breakout extends ApplicationAdapter {
-    enum GameState { GAME, GAME_OVER }
+    enum GameState { GAME_PLAY, GAME_OVER }
 
     List<Block> blocks = new ArrayList<>();
     Paddle paddle;
@@ -24,9 +24,11 @@ public class Breakout extends ApplicationAdapter {
     Sound hitBlockSound;
     Sound hitPaddleSound;
     Sound deathSound;
+    Sound bonusSound;
 
     Player player;
     GameState gameState;
+    int highScore;
 
     BitmapFont bitmapFont;
     GlyphLayout layout;
@@ -40,8 +42,10 @@ public class Breakout extends ApplicationAdapter {
         hitBlockSound = Gdx.audio.newSound(Gdx.files.internal("hit_block.wav"));
         hitPaddleSound = Gdx.audio.newSound(Gdx.files.internal("hit_paddle.wav"));
         deathSound = Gdx.audio.newSound(Gdx.files.internal("death.wav"));
+        bonusSound = Gdx.audio.newSound(Gdx.files.internal("bonus.wav"));
 
         startGameElements();
+        highScore = 0;
 
         batch = new SpriteBatch();
         shape = new ShapeRenderer();
@@ -50,7 +54,7 @@ public class Breakout extends ApplicationAdapter {
     }
 
     private void startGameElements() {
-        gameState = GameState.GAME;
+        gameState = GameState.GAME_PLAY;
         int gameWidth = Gdx.graphics.getWidth();
         int gameHeight = Gdx.graphics.getHeight();
 
@@ -82,8 +86,14 @@ public class Breakout extends ApplicationAdapter {
         shape.setAutoShapeType(true);
         for (Block block : blocks) {
             block.draw(shape);
-            if (block.destroyed)
-                hitBlockSound.play(0.3f);
+            if (block.destroyed) {
+                if (ball.countBlocksCollided() > 1) {
+                    hitBlockSound.play(0.05f);
+                    bonusSound.play(0.30f);
+                } else {
+                    hitBlockSound.play(0.3f);
+                }
+            }
         }
         paddle.draw(shape);
         if (ball.rectsCollided.contains(paddle, false)) {
@@ -93,14 +103,14 @@ public class Breakout extends ApplicationAdapter {
         drawLives(shape);
         shape.end();
 
-
         batch.begin();
         if (gameState == GameState.GAME_OVER) {
             drawGameOver();
         } else {
-            if (player.isDead()) deathSound.play(0.33f);
+            if (player.isDead()) deathSound.play(0.3f);
         }
         drawScore();
+        drawHighScore();
         batch.end();
     }
 
@@ -121,11 +131,19 @@ public class Breakout extends ApplicationAdapter {
     }
 
     private void drawScore() {
-        int scoreLength = (int) (Math.log10(player.score) + 1);
-        int rightPadding = 15 + (scoreLength * 10);
+        layout.setText(bitmapFont, String.valueOf(player.score), Color.WHITE, 0, Align.left,true);
+        float padding = 15f;
+        float x = Gdx.graphics.getWidth() - padding - layout.width;
+        float y = Gdx.graphics.getHeight() - padding;
+        bitmapFont.draw(batch, layout, x, y);
+    }
 
-        bitmapFont.setColor(Color.WHITE);
-        bitmapFont.draw(batch, String.format("%d", player.score), Gdx.graphics.getWidth() - rightPadding, Gdx.graphics.getHeight() - 15);
+    private void drawHighScore() {
+        layout.setText(bitmapFont, String.valueOf(highScore), Color.WHITE, Gdx.graphics.getWidth(), Align.center,true);
+        float padding = 15f;
+        float x = 0;
+        float y = Gdx.graphics.getHeight() - padding;
+        bitmapFont.draw(batch, layout, x, y);
     }
 
     private void drawGameOver() {
@@ -141,17 +159,16 @@ public class Breakout extends ApplicationAdapter {
                 ball.x = r.nextInt(Gdx.graphics.getWidth());
                 ball.y = r.nextInt(Gdx.graphics.getHeight() / 2 - 10);
                 player.reanimate();
-            }
-            gameState = GameState.GAME_OVER;
-
-            // restart
-            if (Gdx.input.isTouched()) {
-                startGameElements();
+            } else {
+                gameState = GameState.GAME_OVER;
+                updateHighScore();
+                if (Gdx.input.isTouched()) {      // restart
+                    startGameElements();
+                }
             }
             return;
         }
-
-        gameState = GameState.GAME;
+        gameState = GameState.GAME_PLAY;
         updateBlocks();
 
         int x = Gdx.input.getX();
@@ -164,6 +181,11 @@ public class Breakout extends ApplicationAdapter {
         ball.checkPlayerFall(player);
 
         ball.update();
+    }
+
+    private void updateHighScore() {
+        if (player.score > highScore)
+            highScore = player.score;
     }
 
     private void updateBlocks() {
@@ -183,6 +205,5 @@ public class Breakout extends ApplicationAdapter {
         if (blocksCollided > 1)         //bonus
             points += Player.SCORE_UNIT * blocksCollided;
         player.incrementScore(points);
-        Gdx.app.log("Points", "Score: " + player.score + ". Points: " + String.valueOf(points) + ". Collisions: " + blocksCollided);
     }
 }
