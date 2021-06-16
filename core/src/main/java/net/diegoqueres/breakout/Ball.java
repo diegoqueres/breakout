@@ -1,7 +1,6 @@
 package net.diegoqueres.breakout;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.Array;
@@ -138,5 +137,25 @@ public class Ball implements MovingShapeInterface {
                 Math.pow((circleDistance.y - rect.height/2), 2);
 
         return (cornerDistance_sq <= Math.pow(this.r, 2));
+    }
+
+    public void slowMotion() {
+        if (isSlowMotion()) return;
+        this.xSpeed = this.xSpeed/2;
+        this.ySpeed = this.ySpeed/2;
+    }
+
+    public boolean isSlowMotion() {
+        return (Math.abs(this.xSpeed) < DEFAULT_X_SPEED && Math.abs(this.ySpeed) < DEFAULT_Y_SPEED);
+    }
+
+    public void normalizeVelocity() {
+        if (isDefaultSpeed()) return;
+        this.xSpeed = this.xSpeed*2;
+        this.ySpeed = this.ySpeed*2;
+    }
+
+    public boolean isDefaultSpeed() {
+        return (Math.abs(this.xSpeed) == DEFAULT_X_SPEED && Math.abs(this.ySpeed) == DEFAULT_Y_SPEED);
     }
 }

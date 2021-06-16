@@ -29,7 +29,9 @@ public class Breakout extends ApplicationAdapter {
     Player player;
     GameState gameState;
     int highScore;
-    float timeIndicateBonusEarned;
+
+    float timerIndicateBonusEarned;
+    float timerBallSlowMotion;
 
     BitmapFont bitmapFont;
     GlyphLayout layout;
@@ -73,7 +75,9 @@ public class Breakout extends ApplicationAdapter {
         paddle = new Paddle(gameWidth/2);
 
         player = new Player();
-        timeIndicateBonusEarned = 0;
+
+        timerBallSlowMotion = 0;
+        timerIndicateBonusEarned = 0;
     }
 
     @Override
@@ -134,7 +138,7 @@ public class Breakout extends ApplicationAdapter {
 
     private void drawScore() {
         Color scoreColor = Color.WHITE;
-        if (timeIndicateBonusEarned > 0) {
+        if (timerIndicateBonusEarned > 0) {
             scoreColor = Color.YELLOW;
         }
         layout.setText(bitmapFont, String.valueOf(player.score), scoreColor, 0, Align.left,true);
@@ -175,8 +179,9 @@ public class Breakout extends ApplicationAdapter {
             return;
         }
         gameState = GameState.GAME_PLAY;
+        updateTimers();
+        updateEffects();
         updateBlocks();
-        updateIndicators();
 
         int x = Gdx.input.getX();
         paddle.updatePosition(x);
@@ -200,6 +205,7 @@ public class Breakout extends ApplicationAdapter {
     		Block b = blocks.get(i);
     		if (b.destroyed) {
                 updateScore();
+                updateBallVelocity();
                 blocks.remove(b);
 				i--; // we need to decrement i when a ball gets removed, otherwise we skip a ball!
 			}
@@ -210,17 +216,36 @@ public class Breakout extends ApplicationAdapter {
         int blocksCollided = ball.countBlocksCollided();
         int points = Player.SCORE_UNIT;
         if (blocksCollided > 1) {        //bonus
-            timeIndicateBonusEarned = 2L;
+            timerIndicateBonusEarned = 2L;
             points += Player.SCORE_UNIT * blocksCollided;
         }
         player.incrementScore(points);
     }
 
-    private void updateIndicators() {
-        if (timeIndicateBonusEarned > 0f) {
-            timeIndicateBonusEarned -= Gdx.graphics.getDeltaTime();
-            if (timeIndicateBonusEarned < 0f)
-                timeIndicateBonusEarned = 0f;
+    private void updateTimers() {
+        timerIndicateBonusEarned = updateTimer(timerIndicateBonusEarned);
+        timerBallSlowMotion = updateTimer(timerBallSlowMotion);
+    }
+
+    private float updateTimer(float timer) {
+        if (timer > 0f) {
+            timer -= Gdx.graphics.getDeltaTime();
+            if (timer < 0f) timer = 0f;
+        }
+        return timer;
+    }
+
+    private void updateBallVelocity() {
+        int blocksCollided = ball.countBlocksCollided();
+        if (blocksCollided > 1 && timerBallSlowMotion == 0) {
+            timerBallSlowMotion = 0.2f;
+            ball.slowMotion();
+        }
+    }
+
+    private void updateEffects() {
+        if (timerBallSlowMotion == 0) {
+            ball.normalizeVelocity();
         }
     }
 }
