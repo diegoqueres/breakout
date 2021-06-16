@@ -2,29 +2,21 @@ package net.diegoqueres.breakout;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import net.diegoqueres.breakout.geometry.Rectangle;
+import net.diegoqueres.breakout.interfaces.MovingShapeInterface;
 
-public class Paddle implements Shape {
+public class Paddle extends Rectangle implements MovingShapeInterface {
     public static final int DEFAULT_BOTTOM_CORNER = 15;
     public static final int DEFAULT_WIDTH = 120;
     public static final int DEFAULT_HEIGHT = 15;
-
-    Color color;
-    int x;
-    int y;
-    int width;
-    int height;
+    public static final Color PADDLE_COLOR = Color.LIGHT_GRAY;
 
     public Paddle(int x) {
         this(x, DEFAULT_BOTTOM_CORNER, DEFAULT_WIDTH, DEFAULT_HEIGHT);
     }
 
     public Paddle(int x, int y, int width, int height) {
-        this.color = Color.LIGHT_GRAY;
-        this.x = x;
-        this.y = y;
-        this.width = width;
-        this.height = height;
+        super(x, y, width, height, PADDLE_COLOR);
         correctIfInInvalidPosition();
     }
 
@@ -58,11 +50,6 @@ public class Paddle implements Shape {
     }
 
     public boolean isOutOfBottomCorner() { return y < DEFAULT_BOTTOM_CORNER; }
-
-    public void draw(ShapeRenderer shape) {
-        shape.setColor(color);
-        shape.rect(x, y, width, height);
-    }
 
     public void updatePosition(int x) {
         this.x = x - (width/2);

@@ -1,8 +1,8 @@
-package net.diegoqueres.breakout;
+package net.diegoqueres.breakout.interfaces;
 
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
-public interface Shape {
+public interface MovingShapeInterface {
     void correctIfInInvalidPosition();
     boolean isOutOfBoundsX();
     boolean isOutOfBoundsY();
