@@ -29,6 +29,7 @@ public class Breakout extends ApplicationAdapter {
     Player player;
     GameState gameState;
     int highScore;
+    float timeIndicateBonusEarned;
 
     BitmapFont bitmapFont;
     GlyphLayout layout;
@@ -72,6 +73,7 @@ public class Breakout extends ApplicationAdapter {
         paddle = new Paddle(gameWidth/2);
 
         player = new Player();
+        timeIndicateBonusEarned = 0;
     }
 
     @Override
@@ -131,7 +133,11 @@ public class Breakout extends ApplicationAdapter {
     }
 
     private void drawScore() {
-        layout.setText(bitmapFont, String.valueOf(player.score), Color.WHITE, 0, Align.left,true);
+        Color scoreColor = Color.WHITE;
+        if (timeIndicateBonusEarned > 0) {
+            scoreColor = Color.YELLOW;
+        }
+        layout.setText(bitmapFont, String.valueOf(player.score), scoreColor, 0, Align.left,true);
         float padding = 15f;
         float x = Gdx.graphics.getWidth() - padding - layout.width;
         float y = Gdx.graphics.getHeight() - padding;
@@ -170,6 +176,7 @@ public class Breakout extends ApplicationAdapter {
         }
         gameState = GameState.GAME_PLAY;
         updateBlocks();
+        updateIndicators();
 
         int x = Gdx.input.getX();
         paddle.updatePosition(x);
@@ -202,8 +209,18 @@ public class Breakout extends ApplicationAdapter {
     private void updateScore() {
         int blocksCollided = ball.countBlocksCollided();
         int points = Player.SCORE_UNIT;
-        if (blocksCollided > 1)         //bonus
+        if (blocksCollided > 1) {        //bonus
+            timeIndicateBonusEarned = 2L;
             points += Player.SCORE_UNIT * blocksCollided;
+        }
         player.incrementScore(points);
+    }
+
+    private void updateIndicators() {
+        if (timeIndicateBonusEarned > 0f) {
+            timeIndicateBonusEarned -= Gdx.graphics.getDeltaTime();
+            if (timeIndicateBonusEarned < 0f)
+                timeIndicateBonusEarned = 0f;
+        }
     }
 }
