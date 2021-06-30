@@ -7,13 +7,19 @@ public class Player {
     public final static  int SCORE_UNIT = 10;
     enum STATE { ALIVE, DEAD }
 
+    int level;
     int lives;
     int score;
     STATE state;
 
     public Player() {
+        init();
+    }
+
+    public void init() {
         this.lives = MAX_LIFES;
         this.score = 0;
+        this.level = 1;
         this.state = STATE.ALIVE;
     }
 
@@ -32,5 +38,13 @@ public class Player {
 
     public void reanimate() {
         this.state = STATE.ALIVE;
+    }
+
+    public void incrementLevel() {
+        this.level++;
+    }
+
+    public int getLevel() {
+        return level;
     }
 }

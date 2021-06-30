@@ -19,7 +19,7 @@ buildscript {
 allprojects {
     apply plugin: "eclipse"
 
-    version = '1.0'
+    version = '0.2'
     ext {
         appName = "breakout"
         gdxVersion = '1.10.0'

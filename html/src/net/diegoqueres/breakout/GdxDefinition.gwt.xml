@@ -4,6 +4,8 @@
 	<inherits name='com.badlogic.gdx.backends.gdx_backends_gwt' />
 
 	<inherits name='Breakout' />
+	<inherits name="com.badlogic.gdx.controllers" />
+	<inherits name="com.badlogic.gdx.controllers.controllers-gwt"/>
 	<entry-point class='net.diegoqueres.breakout.client.HtmlLauncher' />
 	<set-configuration-property name='xsiframe.failIfScriptTag' value='FALSE'/>
 	<set-configuration-property name="gdx.assetpath" value="../core/assets" />
